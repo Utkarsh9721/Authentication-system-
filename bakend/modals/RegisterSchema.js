@@ -14,7 +14,9 @@ const RegisterSchema = new mongoose.Schema({
     password: {
         type: String,
         required: true
-    }
+    },
+    resetPasswordToken: String,
+resetPasswordExpire: Date,
 });
 
 RegisterSchema.pre("save", async function() {

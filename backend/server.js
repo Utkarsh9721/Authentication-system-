@@ -15,7 +15,7 @@ configDotenv();
 const app = express();
 
 app.use(cors({
-    origin: "http://localhost:5173",
+    origin: ["http://localhost:5173", "https://authentication-system-sh1d.onrender.com"],
     credentials: true
 }));
 app.get("/health", (req, res) => {

@@ -18,6 +18,12 @@ app.use(cors({
     origin: "http://localhost:5173",
     credentials: true
 }));
+app.get("/health", (req, res) => {
+    res.status(200).json({
+        status: "ok",
+        message: "Backend is running"
+    });
+});
 
 app.use(cookieParser());
 app.use(express.json());

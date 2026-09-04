@@ -44,11 +44,9 @@ npm-debug.log
 .env
 .git
 .gitignore
-Dockerfile
 .dockerignorenode_modules
 npm-debug.log
 .env
 .git
 .gitignore
-Dockerfile
 .dockerignore

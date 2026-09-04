@@ -1,0 +1,16 @@
+services:
+
+  backend:
+    build: ./backend
+    ports:
+      - "5000:5000"
+    environment:
+      - MONGO_URI=mongodb+srv://cluster3:root@cluster0.vtz5u1b.mongodb.net/?appName=Cluste
+      - JWT_SECRET=ZuW8KRp6F8N15jmyBBELYUAClXVJztoaWaWA2sjMwyW
+    depends_on:
+      - frontend
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "5173:5173"

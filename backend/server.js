@@ -6,7 +6,7 @@ import passport from "passport";
 
 import Connection from "./modals/connection.js";
 import Route from "./routes/routes.js";
-import authRoute from "./routes/auth.js";
+import authRoute from "./middleware/auth.js";
 
 import "./config/passport.js";
 

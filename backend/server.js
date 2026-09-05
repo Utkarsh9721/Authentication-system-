@@ -1,44 +1,38 @@
 import express from "express";
-import cors from "cors";
-import { configDotenv } from "dotenv";
-import cookieParser from "cookie-parser";
 import passport from "passport";
 
-import Connection from "./modals/connection.js";
-import Route from "./routes/routes.js";
+const router = express.Router();
 
-import "./config/passport.js";
+router.get(
+    "/google",
+    passport.authenticate("google", {
+        scope: ["profile", "email"]
+    })
+);
 
-configDotenv();
+router.get(
+    "/google/callback",
+    passport.authenticate("google", {
+        session: false,
+        failureRedirect: `${process.env.FRONTEND_URL}/login`
+    }),
+    (req, res) => {
 
-const app = express();
+        const token = req.user.token;
 
-app.use(cors({
-    origin: [
-        "http://localhost:5173",
-        process.env.FRONTEND_URL
-    ],
-    credentials: true
-}));
+        res.cookie("token", token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: process.env.NODE_ENV === "production"
+                ? "none"
+                : "lax",
+            maxAge: 7 * 24 * 60 * 60 * 1000
+        });
 
-app.use(cookieParser());
-app.use(express.json());
+        res.redirect(
+            `${process.env.FRONTEND_URL}/dashboard`
+        );
+    }
+);
 
-app.use(passport.initialize());
-
-Connection();
-
-app.get("/health", (req, res) => {
-    res.status(200).json({
-        status: "ok",
-        message: "Backend is running"
-    });
-});
-
-app.use("/api", Route);
-
-const PORT = process.env.PORT || 5000;
-
-app.listen(PORT, "0.0.0.0", () => {
-    console.log(`Server is running on port ${PORT}`);
-});
+export default router;

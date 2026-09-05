@@ -12,7 +12,7 @@ const Login = () => {
     const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
     const navigate = useNavigate();
-    const BackendURL = "http://localhost:5000/api";
+    const BackendURL = import.meta.env.VITE_BACKEND_URL;
 
     // Track mouse position for interactive background
     useEffect(() => {
@@ -28,7 +28,7 @@ const Login = () => {
     }, []);
 
     const googleLogin = () => {
-        window.location.href = "http://localhost:5000/auth/google";
+        window.location.href = `${BackendURL}/auth/google`;
     };
 
     const handleSubmit = async (e) => {
@@ -80,8 +80,8 @@ const Login = () => {
                     <div className="orb orb-4"></div>
                 </div>
                 <div className="bg-grid"></div>
-                <div 
-                    className="bg-glow" 
+                <div
+                    className="bg-glow"
                     style={{
                         left: `${mousePosition.x}%`,
                         top: `${mousePosition.y}%`,
@@ -93,9 +93,9 @@ const Login = () => {
                 <div className="login-header">
                     <div className="logo-icon">
                         <svg viewBox="0 0 24 24" fill="none">
-                            <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round"/>
-                            <path d="M2 17L12 22L22 17" stroke="currentColor" strokeWidth="2" strokeLinejoin="round"/>
-                            <path d="M2 12L12 17L22 12" stroke="currentColor" strokeWidth="2" strokeLinejoin="round"/>
+                            <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
+                            <path d="M2 17L12 22L22 17" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
+                            <path d="M2 12L12 17L22 12" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
                         </svg>
                     </div>
                     <h1>Welcome Back</h1>
@@ -120,8 +120,8 @@ const Login = () => {
                     <div className="form-group">
                         <label htmlFor="email">
                             <svg className="input-icon" viewBox="0 0 24 24" fill="none">
-                                <path d="M4 4H20C21.1 4 22 4.9 22 6V18C22 19.1 21.1 20 20 20H4C2.9 20 2 19.1 2 18V6C2 4.9 2.9 4 4 4Z" stroke="currentColor" strokeWidth="2"/>
-                                <path d="M22 6L12 13L2 6" stroke="currentColor" strokeWidth="2" strokeLinejoin="round"/>
+                                <path d="M4 4H20C21.1 4 22 4.9 22 6V18C22 19.1 21.1 20 20 20H4C2.9 20 2 19.1 2 18V6C2 4.9 2.9 4 4 4Z" stroke="currentColor" strokeWidth="2" />
+                                <path d="M22 6L12 13L2 6" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
                             </svg>
                             Email Address
                         </label>
@@ -139,8 +139,8 @@ const Login = () => {
                     <div className="form-group">
                         <label htmlFor="password">
                             <svg className="input-icon" viewBox="0 0 24 24" fill="none">
-                                <rect x="3" y="11" width="18" height="11" rx="2" stroke="currentColor" strokeWidth="2"/>
-                                <path d="M7 11V7C7 4.23858 9.23858 2 12 2C14.7614 2 17 4.23858 17 7V11" stroke="currentColor" strokeWidth="2"/>
+                                <rect x="3" y="11" width="18" height="11" rx="2" stroke="currentColor" strokeWidth="2" />
+                                <path d="M7 11V7C7 4.23858 9.23858 2 12 2C14.7614 2 17 4.23858 17 7V11" stroke="currentColor" strokeWidth="2" />
                             </svg>
                             Password
                         </label>
@@ -166,8 +166,8 @@ const Login = () => {
                         </a>
                     </div>
 
-                    <button 
-                        type="submit" 
+                    <button
+                        type="submit"
                         className="btn btn-primary"
                         disabled={isLoading}
                     >
@@ -177,7 +177,7 @@ const Login = () => {
                             <>
                                 <span>Sign In</span>
                                 <svg className="btn-arrow" viewBox="0 0 24 24" fill="none">
-                                    <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                    <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                                 </svg>
                             </>
                         )}

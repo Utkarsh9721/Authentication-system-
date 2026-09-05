@@ -6,7 +6,6 @@ import passport from "passport";
 
 import Connection from "./modals/connection.js";
 import Route from "./routes/routes.js";
-import authRoute from "./middleware/auth.js";
 
 import "./config/passport.js";
 
@@ -15,15 +14,12 @@ configDotenv();
 const app = express();
 
 app.use(cors({
-    origin: ["http://localhost:5173", "https://authentication-system-sh1d.onrender.com"],
+    origin: [
+        "http://localhost:5173",
+        "https://YOUR-FRONTEND.onrender.com"
+    ],
     credentials: true
 }));
-app.get("/health", (req, res) => {
-    res.status(200).json({
-        status: "ok",
-        message: "Backend is running"
-    });
-});
 
 app.use(cookieParser());
 app.use(express.json());
@@ -32,9 +28,17 @@ app.use(passport.initialize());
 
 Connection();
 
-app.use("/api", Route);
-app.use("/auth", authRoute);
+app.get("/health", (req, res) => {
+    res.status(200).json({
+        status: "ok",
+        message: "Backend is running"
+    });
+});
 
-app.listen(5000, () => {
-    console.log("server is running");
+app.use("/api", Route);
+
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, "0.0.0.0", () => {
+    console.log(`Server is running on port ${PORT}`);
 });

@@ -1,7 +1,7 @@
 import React from "react";
 
-const Dashboard=()=>{
-    return(
+const Dashboard = () => {
+    return (
         <div className="dashboard">
             <h1>wellcome</h1>
         </div>

@@ -13,7 +13,6 @@ const Register = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
-    // Track mouse position for interactive background
     useEffect(() => {
         const handleMouseMove = (e) => {
             setMousePosition({
@@ -55,7 +54,7 @@ const Register = () => {
             setSuccess("");
 
             const res = await axios.post(
-                `${import.meta.env.VITE_BACKEND_URL}/register`,
+                `${import.meta.env.VITE_BACKEND_URL}/api/register`,
                 {
                     name,
                     email,
@@ -70,7 +69,6 @@ const Register = () => {
             setPassword("");
             setConfirmPass("");
 
-            // Clear success message after 5 seconds
             setTimeout(() => {
                 setSuccess("");
             }, 5000);
@@ -97,8 +95,8 @@ const Register = () => {
                     <div className="orb orb-4"></div>
                 </div>
                 <div className="bg-grid"></div>
-                <div 
-                    className="bg-glow" 
+                <div
+                    className="bg-glow"
                     style={{
                         left: `${mousePosition.x}%`,
                         top: `${mousePosition.y}%`,
@@ -110,11 +108,11 @@ const Register = () => {
                 <div className="register-header">
                     <div className="logo-icon">
                         <svg viewBox="0 0 24 24" fill="none">
-                            <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round"/>
-                            <path d="M2 17L12 22L22 17" stroke="currentColor" strokeWidth="2" strokeLinejoin="round"/>
-                            <path d="M2 12L12 17L22 12" stroke="currentColor" strokeWidth="2" strokeLinejoin="round"/>
-                            <path d="M12 12V22" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                            <path d="M12 2V12" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                            <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
+                            <path d="M2 17L12 22L22 17" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
+                            <path d="M2 12L12 17L22 12" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
+                            <path d="M12 12V22" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                            <path d="M12 2V12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                         </svg>
                     </div>
                     <h1>Create Account</h1>
@@ -139,8 +137,8 @@ const Register = () => {
                     <div className="form-group">
                         <label htmlFor="name">
                             <svg className="input-icon" viewBox="0 0 24 24" fill="none">
-                                <path d="M20 21V19C20 16.7909 18.2091 15 16 15H8C5.79086 15 4 16.7909 4 19V21" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                                <circle cx="12" cy="7" r="4" stroke="currentColor" strokeWidth="2"/>
+                                <path d="M20 21V19C20 16.7909 18.2091 15 16 15H8C5.79086 15 4 16.7909 4 19V21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                                <circle cx="12" cy="7" r="4" stroke="currentColor" strokeWidth="2" />
                             </svg>
                             Full Name
                         </label>
@@ -158,8 +156,8 @@ const Register = () => {
                     <div className="form-group">
                         <label htmlFor="email">
                             <svg className="input-icon" viewBox="0 0 24 24" fill="none">
-                                <path d="M4 4H20C21.1 4 22 4.9 22 6V18C22 19.1 21.1 20 20 20H4C2.9 20 2 19.1 2 18V6C2 4.9 2.9 4 4 4Z" stroke="currentColor" strokeWidth="2"/>
-                                <path d="M22 6L12 13L2 6" stroke="currentColor" strokeWidth="2" strokeLinejoin="round"/>
+                                <path d="M4 4H20C21.1 4 22 4.9 22 6V18C22 19.1 21.1 20 20 20H4C2.9 20 2 19.1 2 18V6C2 4.9 2.9 4 4 4Z" stroke="currentColor" strokeWidth="2" />
+                                <path d="M22 6L12 13L2 6" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
                             </svg>
                             Email Address
                         </label>
@@ -177,8 +175,8 @@ const Register = () => {
                     <div className="form-group">
                         <label htmlFor="password">
                             <svg className="input-icon" viewBox="0 0 24 24" fill="none">
-                                <rect x="3" y="11" width="18" height="11" rx="2" stroke="currentColor" strokeWidth="2"/>
-                                <path d="M7 11V7C7 4.23858 9.23858 2 12 2C14.7614 2 17 4.23858 17 7V11" stroke="currentColor" strokeWidth="2"/>
+                                <rect x="3" y="11" width="18" height="11" rx="2" stroke="currentColor" strokeWidth="2" />
+                                <path d="M7 11V7C7 4.23858 9.23858 2 12 2C14.7614 2 17 4.23858 17 7V11" stroke="currentColor" strokeWidth="2" />
                             </svg>
                             Password
                         </label>
@@ -200,10 +198,10 @@ const Register = () => {
                     <div className="form-group">
                         <label htmlFor="confirmPass">
                             <svg className="input-icon" viewBox="0 0 24 24" fill="none">
-                                <rect x="3" y="11" width="18" height="11" rx="2" stroke="currentColor" strokeWidth="2"/>
-                                <path d="M7 11V7C7 4.23858 9.23858 2 12 2C14.7614 2 17 4.23858 17 7V11" stroke="currentColor" strokeWidth="2"/>
-                                <path d="M12 14V17" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                                <path d="M9 14H15" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                                <rect x="3" y="11" width="18" height="11" rx="2" stroke="currentColor" strokeWidth="2" />
+                                <path d="M7 11V7C7 4.23858 9.23858 2 12 2C14.7614 2 17 4.23858 17 7V11" stroke="currentColor" strokeWidth="2" />
+                                <path d="M12 14V17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                                <path d="M9 14H15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                             </svg>
                             Confirm Password
                         </label>
@@ -226,8 +224,8 @@ const Register = () => {
                         </label>
                     </div>
 
-                    <button 
-                        type="submit" 
+                    <button
+                        type="submit"
                         className="btn btn-primary"
                         disabled={isLoading}
                     >
@@ -237,7 +235,7 @@ const Register = () => {
                             <>
                                 <span>Create Account</span>
                                 <svg className="btn-arrow" viewBox="0 0 24 24" fill="none">
-                                    <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                    <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                                 </svg>
                             </>
                         )}

@@ -14,16 +14,18 @@ const App = () => {
     const [isAuthenticated, setIsAuthenticated] = useState(null);
 
     useEffect(() => {
-
         axios.get(
-            "http://localhost:5000/api/me",
+            `${import.meta.env.VITE_BACKEND_URL}/api/me`,
             {
                 withCredentials: true
             }
         )
-        .then(() => setIsAuthenticated(true))
-        .catch(() => setIsAuthenticated(false));
-
+            .then(() => {
+                setIsAuthenticated(true);
+            })
+            .catch(() => {
+                setIsAuthenticated(false);
+            });
     }, []);
 
     return (
@@ -40,15 +42,16 @@ const App = () => {
                     path="/register"
                     element={<Register />}
                 />
-                <Route
-    path="/forgot-password"
-    element={<ForgotPassword />}
-/>
 
-<Route
-    path="/reset-password/:token"
-    element={<ResetPassword />}
-/>
+                <Route
+                    path="/forgot-password"
+                    element={<ForgotPassword />}
+                />
+
+                <Route
+                    path="/reset-password/:token"
+                    element={<ResetPassword />}
+                />
 
                 <Route
                     path="/dashboard"

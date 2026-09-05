@@ -38,9 +38,7 @@ const Forgot = async (req, res) => {
 
         await user.save();
 
-        const resetUrl =
-            `http://localhost:5173/reset-password/${resetToken}`;
-
+        const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
         await transporter.sendMail({
             from: process.env.EMAIL_USER,
             to: user.email,

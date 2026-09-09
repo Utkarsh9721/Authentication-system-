@@ -45,7 +45,7 @@ const ForgotPassword = () => {
             setMessage("");
 
             const res = await axios.post(
-                `${import.meta.env.VITE_BACKEND_URL}/forgot-password`,
+                `${import.meta.env.VITE_BACKEND_URL}/api/forgot-password`,
                 { email }
             );
 
@@ -83,8 +83,8 @@ const ForgotPassword = () => {
                     <div className="orb orb-4"></div>
                 </div>
                 <div className="bg-grid"></div>
-                <div 
-                    className="bg-glow" 
+                <div
+                    className="bg-glow"
                     style={{
                         left: `${mousePosition.x}%`,
                         top: `${mousePosition.y}%`,
@@ -96,13 +96,13 @@ const ForgotPassword = () => {
                 <div className="forgot-header">
                     <div className="logo-icon">
                         <svg viewBox="0 0 24 24" fill="none">
-                            <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round"/>
-                            <path d="M2 17L12 22L22 17" stroke="currentColor" strokeWidth="2" strokeLinejoin="round"/>
-                            <path d="M2 12L12 17L22 12" stroke="currentColor" strokeWidth="2" strokeLinejoin="round"/>
-                            <path d="M12 12V22" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                            <path d="M12 2V12" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                            <path d="M8 7L16 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                            <path d="M8 10L16 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                            <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
+                            <path d="M2 17L12 22L22 17" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
+                            <path d="M2 12L12 17L22 12" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
+                            <path d="M12 12V22" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                            <path d="M12 2V12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                            <path d="M8 7L16 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                            <path d="M8 10L16 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                         </svg>
                     </div>
                     <h1>Forgot Password</h1>
@@ -127,8 +127,8 @@ const ForgotPassword = () => {
                     <div className="form-group">
                         <label htmlFor="email">
                             <svg className="input-icon" viewBox="0 0 24 24" fill="none">
-                                <path d="M4 4H20C21.1 4 22 4.9 22 6V18C22 19.1 21.1 20 20 20H4C2.9 20 2 19.1 2 18V6C2 4.9 2.9 4 4 4Z" stroke="currentColor" strokeWidth="2"/>
-                                <path d="M22 6L12 13L2 6" stroke="currentColor" strokeWidth="2" strokeLinejoin="round"/>
+                                <path d="M4 4H20C21.1 4 22 4.9 22 6V18C22 19.1 21.1 20 20 20H4C2.9 20 2 19.1 2 18V6C2 4.9 2.9 4 4 4Z" stroke="currentColor" strokeWidth="2" />
+                                <path d="M22 6L12 13L2 6" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
                             </svg>
                             Email Address
                         </label>
@@ -146,14 +146,14 @@ const ForgotPassword = () => {
 
                     <div className="form-info">
                         <svg className="info-icon" viewBox="0 0 24 24" fill="none">
-                            <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"/>
-                            <path d="M12 16V12M12 8H12.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                            <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" />
+                            <path d="M12 16V12M12 8H12.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                         </svg>
                         <span>We'll send a password reset link to this email</span>
                     </div>
 
-                    <button 
-                        type="submit" 
+                    <button
+                        type="submit"
                         className="btn btn-primary"
                         disabled={isLoading}
                     >
@@ -162,8 +162,8 @@ const ForgotPassword = () => {
                         ) : (
                             <>
                                 <svg className="btn-icon" viewBox="0 0 24 24" fill="none">
-                                    <path d="M22 2L11 13" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                                    <path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round"/>
+                                    <path d="M22 2L11 13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                                    <path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
                                 </svg>
                                 <span>Send Reset Link</span>
                             </>
@@ -178,7 +178,7 @@ const ForgotPassword = () => {
                 <div className="forgot-actions">
                     <Link to="/login" className="btn btn-secondary">
                         <svg className="btn-icon" viewBox="0 0 24 24" fill="none">
-                            <path d="M19 12H5M5 12L12 19M5 12L12 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M19 12H5M5 12L12 19M5 12L12 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                         </svg>
                         Back to Sign In
                     </Link>

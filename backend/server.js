@@ -8,6 +8,10 @@ import Connection from "./modals/connection.js";
 import Route from "./routes/routes.js";
 import authRoute from "./middleware/auth.js";
 
+// Import new routes
+import friendshipRoutes from "./routes/friendshipRoutes.js";
+import achievementRoutes from "./routes/achievementRoutes.js";
+
 import "./config/passport.js";
 
 configDotenv();
@@ -36,8 +40,18 @@ app.get("/health", (req, res) => {
     });
 });
 
-app.use("/api", Route);
-app.use("/auth", authRoute);
+// ==================== EXISTING ROUTES ====================
+app.use("/api", Route);        // Your existing API routes
+app.use("/auth", authRoute);   // Your existing auth routes
+
+// ==================== NEW ROUTES ====================
+// Friendship and Achievement routes (protected with auth)
+app.use("/api/friends", friendshipRoutes);
+app.use("/api/achievements", achievementRoutes);
+
+// Or if you want them under auth route:
+// app.use("/auth/friends", friendshipRoutes);
+// app.use("/auth/achievements", achievementRoutes);
 
 const PORT = process.env.PORT || 5000;
 

@@ -6,10 +6,10 @@ import LoginLimit from "../middleware/rateLimit.js"
 import Forgot from "../controllers/forgotpass/forgotPass.js"
 import ResetPassword from "../controllers/forgotpass/newPass.js";
 
-const Route=express.Router();
+const Route = express.Router();
 
-Route.post("/register",RegisterData);
-Route.post("/login",LoginLimit,Login);
+Route.post("/register", RegisterData);
+Route.post("/login", LoginLimit, Login);
 Route.post(
     "/forgot-password",
     Forgot
@@ -19,9 +19,9 @@ Route.post(
     "/reset-password/:token",
     ResetPassword
 );
-Route.get("/me",auth,(req,res)=>{
+Route.get("/me", auth, (req, res) => {
     res.status(200).json({
-        user:req.user
+        user: req.user
     })
 })
 

@@ -5,7 +5,6 @@ import Register from "../modals/RegisterSchema.js";
 
 configDotenv();
 
-console.log("GOOGLE_CLIENT_ID:", process.env.GOOGLE_CLIENT_ID);
 
 passport.use(
     new GoogleStrategy(

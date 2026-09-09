@@ -39,7 +39,7 @@ Route.get(
         });
 
         res.redirect(
-            `${process.env.FRONTEND_URL}/dashboard`
+            `${process.env.FRONTEND_URL}/api/dashboard`
         );
     }
 );

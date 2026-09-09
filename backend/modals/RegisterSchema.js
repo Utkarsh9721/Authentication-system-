@@ -11,7 +11,7 @@ const RegisterSchema = new mongoose.Schema({
     email: {
         type: String,
         required: true,
-        unique: true,
+        unique: true, // ✅ Keep this
         lowercase: true,
         trim: true
     },
@@ -20,11 +20,11 @@ const RegisterSchema = new mongoose.Schema({
         required: true,
         select: false
     },
-    // Google OAuth fields
     googleId: {
         type: String,
         sparse: true,
-        index: true
+        // ❌ Remove 'index: true' from here
+        unique: true
     },
     authProvider: {
         type: String,
@@ -45,7 +45,6 @@ const RegisterSchema = new mongoose.Schema({
         type: Date,
         default: null
     },
-    // Account status
     isActive: {
         type: Boolean,
         default: true
@@ -53,6 +52,10 @@ const RegisterSchema = new mongoose.Schema({
 }, {
     timestamps: true
 });
+
+// ❌ Remove these duplicate index definitions
+// RegisterSchema.index({ email: 1 });
+// RegisterSchema.index({ googleId: 1 });
 
 // Hash password before saving
 RegisterSchema.pre("save", async function (next) {
@@ -73,10 +76,6 @@ RegisterSchema.methods.comparePassword = async function (password) {
     if (!this.password) return false;
     return bcrypt.compare(password, this.password);
 };
-
-// Indexes
-RegisterSchema.index({ email: 1 });
-RegisterSchema.index({ googleId: 1 });
 
 const Register = mongoose.model("Register", RegisterSchema);
 export default Register;

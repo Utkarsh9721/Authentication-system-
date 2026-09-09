@@ -50,7 +50,8 @@ app.use(cors({
     optionsSuccessStatus: 200
 }));
 
-app.options('*', cors());
+// FIX: Remove app.options('*', cors()); - this is causing the error
+// Instead, let the cors middleware handle OPTIONS requests automatically
 
 // ==================== MIDDLEWARE ====================
 app.use(cookieParser());
@@ -67,8 +68,7 @@ app.get("/health", (req, res) => {
         status: "ok",
         message: "Authentication System Backend is running",
         environment: process.env.NODE_ENV || 'development',
-        timestamp: new Date().toISOString(),
-        googleCallbackUrl: process.env.CALLBACK_URL
+        timestamp: new Date().toISOString()
     });
 });
 
@@ -81,7 +81,16 @@ app.use((req, res) => {
         success: false,
         message: "Route not found",
         path: req.path,
-        method: req.method
+        method: req.method,
+        availableRoutes: [
+            "/api/register",
+            "/api/login",
+            "/api/forgot-password",
+            "/api/reset-password/:token",
+            "/api/me",
+            "/api/google",
+            "/api/google/callback"
+        ]
     });
 });
 
@@ -98,7 +107,9 @@ app.use((err, req, res, next) => {
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, "0.0.0.0", () => {
     console.log(`🚀 Server running on port ${PORT}`);
-    console.log(`📡 API Base: /api/*`);
-    console.log(`📡 Google OAuth: GET /api/auth/google`);
-    console.log(`📡 Google Callback: GET /api/auth/google/callback`);
+    console.log(`📡 Local Auth: /api/*`);
+    console.log(`📡 Google OAuth: GET /api/google`);
+    console.log(`📡 Google Callback: GET /api/google/callback`);
 });
+
+export default app;

@@ -1,87 +1,42 @@
-// src/middleware/auth.js (or wherever your Google OAuth routes are)
-import express from "express";
-import passport from "passport";
-import jwt from "jsonwebtoken";
+// src/routes/routes.js
+import express, { Router } from "express";
+import RegisterData from "../controllers/register/register.js";
+import Login from "../controllers/login/login.js";
+import auth from "../middleware/auth.js";
+import LoginLimit from "../middleware/rateLimit.js";
+import Forgot from "../controllers/forgotpass/forgotPass.js";
+import ResetPassword from "../controllers/forgotpass/newPass.js";
+
+// Import Google OAuth routes
+import googleAuthRoutes from "../middleware/auth.js";
 
 const Route = express.Router();
 
-// ==================== GOOGLE OAUTH ROUTES ====================
-// Initiate Google OAuth
-Route.get(
-    "/google",
-    passport.authenticate("google", {
-        scope: ["profile", "email"],
-        prompt: "select_account",
-        accessType: "offline"
-    })
-);
-
-// Google OAuth Callback
-Route.get(
-    "/google/callback",
-    passport.authenticate("google", {
-        session: false,
-        failureRedirect: `${process.env.FRONTEND_URL}/login?error=oauth_failed`
-    }),
-    async (req, res) => {
-        try {
-            // Generate JWT token
-            const token = jwt.sign(
-                {
-                    id: req.user._id,
-                    email: req.user.email,
-                    name: req.user.name
-                },
-                process.env.JWT_SECRET,
-                {
-                    expiresIn: "7d",
-                }
-            );
-
-            // Set cookie (optional)
-            res.cookie("token", token, {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === "production",
-                sameSite: process.env.NODE_ENV === "production"
-                    ? "none"
-                    : "lax",
-                maxAge: 7 * 24 * 60 * 60 * 1000,
-            });
-
-            // Redirect to frontend with token
-            const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
-            res.redirect(
-                `${frontendUrl}/oauth-success?token=${token}&user=${encodeURIComponent(JSON.stringify({
-                    id: req.user._id,
-                    name: req.user.name,
-                    email: req.user.email
-                }))}`
-            );
-        } catch (error) {
-            console.error('Google OAuth Callback Error:', error);
-            res.redirect(`${process.env.FRONTEND_URL}/login?error=oauth_error`);
-        }
-    }
-);
-
-// Get user info from Google token (optional)
-Route.get("/google/user",
-    passport.authenticate("jwt", { session: false }),
-    (req, res) => {
-        res.status(200).json({
-            success: true,
-            user: req.user
-        });
-    }
-);
-
-// Logout route (clear cookie)
-Route.get("/logout", (req, res) => {
-    res.clearCookie("token");
+// ==================== LOCAL AUTH ROUTES ====================
+Route.post("/register", RegisterData);
+Route.post("/login", LoginLimit, Login);
+Route.post("/forgot-password", Forgot);
+Route.post("/reset-password/:token", ResetPassword);
+Route.get("/me", auth, (req, res) => {
     res.status(200).json({
         success: true,
-        message: "Logged out successfully"
+        user: req.user
     });
 });
+
+// ==================== GOOGLE OAUTH ROUTES ====================
+// Mount Google OAuth routes under /auth
+Route.use("/auth", googleAuthRoutes);
+
+console.log("✅ Routes registered:");
+console.log("   - POST /api/register");
+console.log("   - POST /api/login");
+console.log("   - POST /api/forgot-password");
+console.log("   - POST /api/reset-password/:token");
+console.log("   - GET /api/me");
+console.log("   - GET /api/auth/google (Google OAuth)");
+console.log("   - GET /api/auth/google/callback (Google Callback)");
+console.log("   - GET /api/auth/google/user (Google User)");
+console.log("   - GET /api/auth/logout");
 
 export default Route;

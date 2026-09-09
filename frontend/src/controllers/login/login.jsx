@@ -28,7 +28,7 @@ const Login = () => {
     }, []);
 
     const googleLogin = () => {
-        window.location.href = `${BackendURL}/auth/google`;
+        window.location.href = `${BackendURL}/api/auth/google`;
     };
 
     const handleSubmit = async (e) => {

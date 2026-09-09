@@ -65,7 +65,7 @@ const ResetPassword = () => {
             setMessage("");
 
             const res = await axios.post(
-                `${import.meta.env.VITE_BACKEND_URL}/reset-password/${token}`,
+                `${import.meta.env.VITE_BACKEND_URL}/api/reset-password/${token}`,
                 { password }
             );
 
@@ -113,8 +113,8 @@ const ResetPassword = () => {
                     <div className="orb orb-4"></div>
                 </div>
                 <div className="bg-grid"></div>
-                <div 
-                    className="bg-glow" 
+                <div
+                    className="bg-glow"
                     style={{
                         left: `${mousePosition.x}%`,
                         top: `${mousePosition.y}%`,
@@ -126,15 +126,15 @@ const ResetPassword = () => {
                 <div className="reset-header">
                     <div className="logo-icon">
                         <svg viewBox="0 0 24 24" fill="none">
-                            <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round"/>
-                            <path d="M2 17L12 22L22 17" stroke="currentColor" strokeWidth="2" strokeLinejoin="round"/>
-                            <path d="M2 12L12 17L22 12" stroke="currentColor" strokeWidth="2" strokeLinejoin="round"/>
-                            <path d="M12 12V22" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                            <path d="M12 2V12" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                            <path d="M8 7L16 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                            <path d="M8 10L16 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                            <path d="M16 15L16 17" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                            <path d="M16 19L16 21" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                            <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
+                            <path d="M2 17L12 22L22 17" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
+                            <path d="M2 12L12 17L22 12" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
+                            <path d="M12 12V22" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                            <path d="M12 2V12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                            <path d="M8 7L16 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                            <path d="M8 10L16 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                            <path d="M16 15L16 17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                            <path d="M16 19L16 21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                         </svg>
                     </div>
                     <h1>Reset Password</h1>
@@ -159,8 +159,8 @@ const ResetPassword = () => {
                     <div className="form-group">
                         <label htmlFor="password">
                             <svg className="input-icon" viewBox="0 0 24 24" fill="none">
-                                <rect x="3" y="11" width="18" height="11" rx="2" stroke="currentColor" strokeWidth="2"/>
-                                <path d="M7 11V7C7 4.23858 9.23858 2 12 2C14.7614 2 17 4.23858 17 7V11" stroke="currentColor" strokeWidth="2"/>
+                                <rect x="3" y="11" width="18" height="11" rx="2" stroke="currentColor" strokeWidth="2" />
+                                <path d="M7 11V7C7 4.23858 9.23858 2 12 2C14.7614 2 17 4.23858 17 7V11" stroke="currentColor" strokeWidth="2" />
                             </svg>
                             New Password
                         </label>
@@ -184,14 +184,14 @@ const ResetPassword = () => {
                             >
                                 {showPassword ? (
                                     <svg viewBox="0 0 24 24" fill="none">
-                                        <path d="M1 12C1 12 5 4 12 4C19 4 23 12 23 12C23 12 19 20 12 20C5 20 1 12 1 12Z" stroke="currentColor" strokeWidth="2"/>
-                                        <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="2"/>
-                                        <path d="M20 20L4 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                                        <path d="M1 12C1 12 5 4 12 4C19 4 23 12 23 12C23 12 19 20 12 20C5 20 1 12 1 12Z" stroke="currentColor" strokeWidth="2" />
+                                        <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="2" />
+                                        <path d="M20 20L4 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                                     </svg>
                                 ) : (
                                     <svg viewBox="0 0 24 24" fill="none">
-                                        <path d="M1 12C1 12 5 4 12 4C19 4 23 12 23 12C23 12 19 20 12 20C5 20 1 12 1 12Z" stroke="currentColor" strokeWidth="2"/>
-                                        <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="2"/>
+                                        <path d="M1 12C1 12 5 4 12 4C19 4 23 12 23 12C23 12 19 20 12 20C5 20 1 12 1 12Z" stroke="currentColor" strokeWidth="2" />
+                                        <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="2" />
                                     </svg>
                                 )}
                             </button>
@@ -201,7 +201,7 @@ const ResetPassword = () => {
                         {password.length > 0 && (
                             <div className="password-strength">
                                 <div className="strength-bar">
-                                    <div 
+                                    <div
                                         className="strength-fill"
                                         style={{
                                             width: strengthInfo.width,
@@ -240,10 +240,10 @@ const ResetPassword = () => {
                     <div className="form-group">
                         <label htmlFor="confirmPassword">
                             <svg className="input-icon" viewBox="0 0 24 24" fill="none">
-                                <rect x="3" y="11" width="18" height="11" rx="2" stroke="currentColor" strokeWidth="2"/>
-                                <path d="M7 11V7C7 4.23858 9.23858 2 12 2C14.7614 2 17 4.23858 17 7V11" stroke="currentColor" strokeWidth="2"/>
-                                <path d="M12 14V17" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                                <path d="M9 14H15" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                                <rect x="3" y="11" width="18" height="11" rx="2" stroke="currentColor" strokeWidth="2" />
+                                <path d="M7 11V7C7 4.23858 9.23858 2 12 2C14.7614 2 17 4.23858 17 7V11" stroke="currentColor" strokeWidth="2" />
+                                <path d="M12 14V17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                                <path d="M9 14H15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                             </svg>
                             Confirm Password
                         </label>
@@ -261,14 +261,14 @@ const ResetPassword = () => {
                                 {password === confirmPassword ? (
                                     <>
                                         <svg viewBox="0 0 24 24" fill="none">
-                                            <path d="M20 6L9 17L4 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                            <path d="M20 6L9 17L4 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                                         </svg>
                                         Passwords match
                                     </>
                                 ) : (
                                     <>
                                         <svg viewBox="0 0 24 24" fill="none">
-                                            <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                                            <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                                         </svg>
                                         Passwords do not match
                                     </>
@@ -277,8 +277,8 @@ const ResetPassword = () => {
                         )}
                     </div>
 
-                    <button 
-                        type="submit" 
+                    <button
+                        type="submit"
                         className="btn btn-primary"
                         disabled={isLoading}
                     >
@@ -287,8 +287,8 @@ const ResetPassword = () => {
                         ) : (
                             <>
                                 <svg className="btn-icon" viewBox="0 0 24 24" fill="none">
-                                    <path d="M20 12C20 16.4183 16.4183 20 12 20C7.58172 20 4 16.4183 4 12C4 7.58172 7.58172 4 12 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                                    <path d="M20 12L16 8M20 12L16 16" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                                    <path d="M20 12C20 16.4183 16.4183 20 12 20C7.58172 20 4 16.4183 4 12C4 7.58172 7.58172 4 12 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                                    <path d="M20 12L16 8M20 12L16 16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                                 </svg>
                                 <span>Reset Password</span>
                             </>
@@ -303,7 +303,7 @@ const ResetPassword = () => {
                 <div className="reset-actions">
                     <Link to="/login" className="btn btn-secondary">
                         <svg className="btn-icon" viewBox="0 0 24 24" fill="none">
-                            <path d="M19 12H5M5 12L12 19M5 12L12 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M19 12H5M5 12L12 19M5 12L12 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                         </svg>
                         Back to Sign In
                     </Link>

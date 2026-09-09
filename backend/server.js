@@ -8,8 +8,6 @@ import Connection from "./modals/connection.js";
 import Route from "./routes/routes.js";
 import authRoute from "./middleware/auth.js";
 
-// Import achievement routes
-import achievementRoutes from "./routes/achievementRoutes.js";
 
 import "./config/passport.js";
 

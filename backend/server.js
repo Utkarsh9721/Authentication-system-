@@ -6,7 +6,6 @@ import passport from "passport";
 
 import Connection from "./modals/connection.js";
 import Route from "./routes/routes.js";
-import authRoute from "./middleware/auth.js";
 
 import "./config/passport.js";
 
@@ -56,17 +55,8 @@ const corsOptions = {
     maxAge: 86400
 };
 
+// Apply CORS middleware (this handles OPTIONS automatically)
 app.use(cors(corsOptions));
-
-// Handle preflight requests
-app.options('/*', (req, res) => {
-    res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
-    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
-    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Accept, Origin, Cookie, Set-Cookie');
-    res.header('Access-Control-Allow-Credentials', 'true');
-    res.header('Access-Control-Max-Age', '86400');
-    res.status(200).end();
-});
 
 // ==================== OTHER MIDDLEWARE ====================
 app.use(cookieParser());
@@ -89,29 +79,32 @@ app.get("/health", (req, res) => {
 
 // ==================== ROUTES ====================
 // Only authentication routes
-app.use("/api", Route);        // Your existing API routes
-app.use("/auth", authRoute);   // Your existing auth routes
+app.use("/api", Route);
+app.use("/auth", Route); // If you also want routes under /auth
 
 // ==================== DEBUG ROUTES ====================
 app.get("/routes", (req, res) => {
     const routes = [];
 
-    app._router.stack.forEach((middleware) => {
-        if (middleware.route) {
+    function extractRoutes(layer, basePath = '') {
+        if (layer.route) {
+            const path = basePath + layer.route.path;
             routes.push({
-                path: middleware.route.path,
-                methods: Object.keys(middleware.route.methods)
+                path: path,
+                methods: Object.keys(layer.route.methods)
             });
-        } else if (middleware.name === 'router' && middleware.handle) {
-            middleware.handle.stack.forEach((handler) => {
-                if (handler.route) {
-                    routes.push({
-                        path: handler.route.path,
-                        methods: Object.keys(handler.route.methods)
-                    });
-                }
+        } else if (layer.name === 'router' && layer.handle) {
+            const routerPath = layer.regexp ?
+                layer.regexp.source.replace(/\\/g, '').replace(/\^/g, '').replace(/\?/g, '') :
+                '';
+            layer.handle.stack.forEach((handler) => {
+                extractRoutes(handler, basePath + routerPath);
             });
         }
+    }
+
+    app._router.stack.forEach((middleware) => {
+        extractRoutes(middleware);
     });
 
     res.json({
@@ -134,8 +127,11 @@ app.use((req, res) => {
             "/api/forgot-password",
             "/api/reset-password/:token",
             "/api/me",
+            "/auth/register",
+            "/auth/login",
             "/auth/forgot-password",
             "/auth/reset-password/:token",
+            "/auth/me",
             "/health",
             "/routes"
         ]

@@ -45,7 +45,7 @@ const Login = () => {
             setSuccess("");
 
             const res = await axios.post(
-                `${BackendURL}/login`,
+                `${BackendURL}/api/login`,
                 { email, password },
                 { withCredentials: true }
             );

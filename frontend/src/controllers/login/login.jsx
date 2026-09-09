@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import "./Login.css";
 
 const Login = () => {
@@ -12,7 +12,7 @@ const Login = () => {
     const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
     const navigate = useNavigate();
-    const BackendURL = import.meta.env.VITE_BACKEND_URL;
+    const BackendURL = import.meta.env.VITE_BACKEND_URL || "https://authentication-system-sh1d.onrender.com";
 
     // Track mouse position for interactive background
     useEffect(() => {
@@ -27,8 +27,37 @@ const Login = () => {
         return () => window.removeEventListener("mousemove", handleMouseMove);
     }, []);
 
+    // Check if user is already logged in
+    useEffect(() => {
+        const token = localStorage.getItem("token");
+        if (token) {
+            navigate("/dashboard");
+        }
+    }, [navigate]);
+
+    // Handle Google OAuth callback
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        const token = params.get("token");
+        const userParam = params.get("user");
+
+        if (token) {
+            localStorage.setItem("token", token);
+            if (userParam) {
+                try {
+                    const user = JSON.parse(decodeURIComponent(userParam));
+                    localStorage.setItem("user", JSON.stringify(user));
+                } catch (e) {
+                    console.error("Failed to parse user data:", e);
+                }
+            }
+            navigate("/dashboard");
+        }
+    }, [navigate]);
+
+    // Google Login - WITHOUT /api prefix (matches Google Console)
     const googleLogin = () => {
-        window.location.href = `${BackendURL}/api/auth/google`;
+        window.location.href = `${BackendURL}/auth/google`;
     };
 
     const handleSubmit = async (e) => {
@@ -50,7 +79,15 @@ const Login = () => {
                 { withCredentials: true }
             );
 
-            setSuccess(res.data.message);
+            // Store token and user data
+            if (res.data.token) {
+                localStorage.setItem("token", res.data.token);
+                if (res.data.data) {
+                    localStorage.setItem("user", JSON.stringify(res.data.data));
+                }
+            }
+
+            setSuccess(res.data.message || "Login successful!");
             setEmail("");
             setPassword("");
 
@@ -61,8 +98,10 @@ const Login = () => {
         } catch (error) {
             if (error.response) {
                 setError(error.response.data.message || "Login failed");
+            } else if (error.request) {
+                setError("No response from server. Please check your connection.");
             } else {
-                setError("Server error. Please try again later.");
+                setError("An error occurred. Please try again.");
             }
         } finally {
             setIsLoading(false);
@@ -161,9 +200,9 @@ const Login = () => {
                             <span className="checkmark"></span>
                             Remember me
                         </label>
-                        <a href="/forgot-password" className="forgot-link">
+                        <Link to="/forgot-password" className="forgot-link">
                             Forgot password?
-                        </a>
+                        </Link>
                     </div>
 
                     <button
@@ -204,7 +243,7 @@ const Login = () => {
                 </button>
 
                 <div className="login-footer">
-                    <p>Don't have an account? <a href="/register">Create one now</a></p>
+                    <p>Don't have an account? <Link to="/register">Create one now</Link></p>
                 </div>
             </div>
         </div>

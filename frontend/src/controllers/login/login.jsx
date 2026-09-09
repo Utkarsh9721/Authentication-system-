@@ -57,7 +57,7 @@ const Login = () => {
 
     // Google Login - WITHOUT /api prefix (matches Google Console)
     const googleLogin = () => {
-        window.location.href = `${BackendURL}/api/auth/google`;
+        window.location.href = `${BackendURL}/api/google`;
     };
 
     const handleSubmit = async (e) => {

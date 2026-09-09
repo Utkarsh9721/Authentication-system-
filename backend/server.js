@@ -19,8 +19,10 @@ const allowedOrigins = [
     "http://localhost:3000",
     "http://localhost:5000",
     process.env.FRONTEND_URL,
-    "https://authentication-system-tawny.vercel.app",
-    "https://authentication-system-qacwnpc8k.vercel.app"
+    process.env.FRONTEND_URL_2,
+    process.env.FRONTEND_URL_3,
+    process.env.FRONTEND_URL_4,
+
 ].filter(Boolean);
 
 console.log('🔗 CORS Allowed Origins:', allowedOrigins);

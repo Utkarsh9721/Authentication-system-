@@ -32,13 +32,13 @@ passport.use(
         {
             clientID: process.env.GOOGLE_CLIENT_ID,
             clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-            // FIXED: Remove /api/ to match Google Console
-            callbackURL: process.env.CALLBACK_URL || "https://authentication-system-sh1d.onrender.com/auth/google/callback",
+            // ✅ FIXED: Matches your actual route /api/google/callback
+            callbackURL: "https://authentication-system-sh1d.onrender.com/api/google/callback",
             passReqToCallback: true
         },
         async (req, accessToken, refreshToken, profile, done) => {
             try {
-                console.log('Google Profile received:', profile.emails[0].value);
+                console.log('✅ Google Profile received:', profile.emails[0].value);
 
                 // Check if user exists by email
                 let user = await Register.findOne({
@@ -60,20 +60,20 @@ passport.use(
                         profilePicture: profile.photos?.[0]?.value || null
                     });
 
-                    console.log('New user created via Google OAuth:', user.email);
+                    console.log('✅ New user created via Google OAuth:', user.email);
                 } else {
                     // Update Google ID if not set
                     if (!user.googleId) {
                         user.googleId = profile.id;
                         await user.save();
                     }
-                    console.log('User logged in via Google OAuth:', user.email);
+                    console.log('✅ User logged in via Google OAuth:', user.email);
                 }
 
                 return done(null, user);
 
             } catch (error) {
-                console.error('Google OAuth Error:', error);
+                console.error('❌ Google OAuth Error:', error);
                 return done(error, null);
             }
         }

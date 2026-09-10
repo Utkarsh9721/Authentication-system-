@@ -1,17 +1,17 @@
 // src/routes/routes.js
-import express, { Router } from "express";
+import express from "express";
 import passport from "passport";
 import jwt from "jsonwebtoken";
 import RegisterData from "../controllers/register/register.js";
 import Login from "../controllers/login/login.js";
-import auth from "../middleware/auth.js";
+import auth from "../middleware/authMiddleware.js";
 import LoginLimit from "../middleware/rateLimit.js";
 import Forgot from "../controllers/forgotpass/forgotPass.js";
 import ResetPassword from "../controllers/forgotpass/newPass.js";
 
 const Route = express.Router();
 
-// ==================== LOCAL AUTH ROUTES (with /api) ====================
+// ==================== LOCAL AUTH ROUTES ====================
 Route.post("/register", RegisterData);
 Route.post("/login", LoginLimit, Login);
 Route.post("/forgot-password", Forgot);
@@ -23,9 +23,8 @@ Route.get("/me", auth, (req, res) => {
     });
 });
 
-// ==================== GOOGLE OAUTH ROUTES (without /api) ====================
-// Mount directly on /auth/google instead of /api/auth/google
-// Initiate Google OAuth
+// ==================== GOOGLE OAUTH ROUTES ====================
+// Step 1: Redirect to Google
 Route.get("/google",
     passport.authenticate("google", {
         scope: ["profile", "email"],
@@ -33,49 +32,58 @@ Route.get("/google",
     })
 );
 
-// Google OAuth callback
+// Step 2: Handle Google callback
 Route.get("/google/callback",
-    passport.authenticate("google", {
-        session: false,
-        failureRedirect: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/login?error=oauth_failed`
-    }),
-    async (req, res) => {
-        try {
-            const user = req.user;
+    (req, res, next) => {
+        passport.authenticate("google", { session: false }, (err, user, info) => {
+            if (err) {
+                console.error("❌ Google auth error:", err);
+                const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
+                return res.redirect(`${frontendUrl}/login?error=oauth_error`);
+            }
 
-            // Generate JWT token
-            const token = jwt.sign(
-                {
+            if (!user) {
+                console.error("❌ Google auth failed:", info);
+                const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
+                return res.redirect(`${frontendUrl}/login?error=oauth_failed`);
+            }
+
+            try {
+                // Generate JWT token
+                const token = jwt.sign(
+                    {
+                        id: user._id,
+                        email: user.email,
+                        name: user.name
+                    },
+                    process.env.JWT_SECRET,
+                    { expiresIn: "7d" }
+                );
+
+                // Set cookie (optional)
+                res.cookie("token", token, {
+                    httpOnly: true,
+                    secure: process.env.NODE_ENV === "production",
+                    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+                    maxAge: 7 * 24 * 60 * 60 * 1000
+                });
+
+                // Redirect to frontend with token
+                const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
+                const userData = encodeURIComponent(JSON.stringify({
                     id: user._id,
-                    email: user.email,
-                    name: user.name
-                },
-                process.env.JWT_SECRET,
-                { expiresIn: "7d" }
-            );
+                    name: user.name,
+                    email: user.email
+                }));
 
-            // Set cookie
-            res.cookie("token", token, {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === "production",
-                sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-                maxAge: 7 * 24 * 60 * 60 * 1000
-            });
-
-            // Redirect to frontend with token
-            const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
-            const userData = encodeURIComponent(JSON.stringify({
-                id: user._id,
-                name: user.name,
-                email: user.email
-            }));
-
-            res.redirect(`${frontendUrl}/oauth-success?token=${token}&user=${userData}`);
-
-        } catch (error) {
-            console.error("Google OAuth callback error:", error);
-            res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:5173'}/login?error=oauth_error`);
-        }
+                console.log("✅ Google OAuth successful, redirecting to:", `${frontendUrl}/oauth-success`);
+                res.redirect(`${frontendUrl}/oauth-success?token=${token}&user=${userData}`);
+            } catch (error) {
+                console.error("❌ Token generation error:", error);
+                const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
+                res.redirect(`${frontendUrl}/login?error=token_error`);
+            }
+        })(req, res, next);
     }
 );
 
@@ -85,7 +93,7 @@ console.log("   - POST /api/login");
 console.log("   - POST /api/forgot-password");
 console.log("   - POST /api/reset-password/:token");
 console.log("   - GET /api/me");
-console.log("   - GET /auth/google (Google OAuth - matches Google Console)");
-console.log("   - GET /auth/google/callback (Google Callback - matches Google Console)");
+console.log("   - GET /api/google");
+console.log("   - GET /api/google/callback");
 
 export default Route;

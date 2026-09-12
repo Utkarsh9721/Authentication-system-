@@ -1,25 +1,16 @@
 // src/config/passport.js
 import passport from "passport";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
-import { Strategy as JwtStrategy } from "passport-jwt";
+import { Strategy as JwtStrategy, ExtractJwt } from "passport-jwt";
 import { configDotenv } from "dotenv";
 import Register from "../modals/RegisterSchema.js";
 import bcrypt from "bcrypt";
 
 configDotenv();
 
-// ==================== COOKIE EXTRACTOR ====================
-const cookieExtractor = (req) => {
-    let token = null;
-    if (req && req.cookies) {
-        token = req.cookies["token"];
-    }
-    return token;
-};
-
-// ==================== JWT STRATEGY (COOKIE-BASED) ====================
+// ==================== JWT STRATEGY (HEADER-BASED) ====================
 const jwtOptions = {
-    jwtFromRequest: cookieExtractor,
+    jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),  // ✅ Header
     secretOrKey: process.env.JWT_SECRET
 };
 
@@ -54,7 +45,6 @@ passport.use(
                 console.log("🆔 Google ID:", profile.id);
 
                 if (!profile.emails || !profile.emails[0]) {
-                    console.error("❌ No email in Google profile");
                     return done(new Error("No email provided by Google"), null);
                 }
 
@@ -63,7 +53,6 @@ passport.use(
                 });
 
                 if (!user) {
-                    console.log("🆕 Creating new user...");
                     const randomPassword =
                         Math.random().toString(36) + Date.now().toString();
                     const hashedPassword = await bcrypt.hash(randomPassword, 10);
@@ -80,21 +69,16 @@ passport.use(
 
                     console.log("✅ New user created:", user.email);
                 } else {
-                    console.log("👤 Existing user found:", user.email);
                     if (!user.googleId) {
                         user.googleId = profile.id;
                         await user.save();
-                        console.log("✅ Google ID added to existing user");
                     }
+                    console.log("👤 Existing user found:", user.email);
                 }
 
-                console.log("🎉 Returning user to Passport");
                 return done(null, user);
             } catch (error) {
-                console.error("❌❌❌ GOOGLE OAUTH ERROR ❌❌❌");
-                console.error("Name:", error.name);
-                console.error("Message:", error.message);
-                console.error("Stack:", error.stack);
+                console.error("❌ Google OAuth error:", error);
                 return done(error, null);
             }
         }

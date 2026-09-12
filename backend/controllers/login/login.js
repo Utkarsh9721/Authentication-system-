@@ -13,7 +13,6 @@ const Login = async (req, res) => {
             });
         }
 
-        // ✅ .select("+password") — REQUIRED because schema has select: false
         const user = await Register.findOne({ email }).select("+password");
 
         if (!user) {
@@ -38,19 +37,10 @@ const Login = async (req, res) => {
             { expiresIn: "7d" }
         );
 
-        // ✅ FIXED cookie options (cross-domain)
-        res.cookie("token", token, {
-            httpOnly: true,
-            secure: true,               // ✅ was false
-            sameSite: "none",           // ✅ was lax
-            maxAge: 7 * 24 * 60 * 60 * 1000,
-            domain: ".onrender.com",    // ✅ was missing
-            path: "/"
-        });
-
         return res.status(200).json({
             success: true,
             message: "Login successful",
+            token,               // ✅ Return token in response
             data: {
                 id: user._id,
                 name: user.name,

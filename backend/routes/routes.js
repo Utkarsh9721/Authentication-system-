@@ -11,14 +11,13 @@ import authMiddleware from "../middleware/authMiddleware.js";
 
 const Route = express.Router();
 
-// ==================== LOCAL AUTH ROUTES ====================
+// ==================== LOCAL AUTH ====================
 Route.post("/register", RegisterData);
 Route.post("/login", LoginLimit, Login);
 Route.post("/forgot-password", Forgot);
 Route.post("/reset-password/:token", ResetPassword);
 
 // ==================== AUTH CHECK ====================
-// ✅ Reads cookie (via authMiddleware) and returns user
 Route.get("/me", authMiddleware, (req, res) => {
     res.status(200).json({
         success: true,
@@ -28,21 +27,13 @@ Route.get("/me", authMiddleware, (req, res) => {
 
 // ==================== LOGOUT ====================
 Route.post("/logout", (req, res) => {
-    res.clearCookie("token", {
-        httpOnly: true,
-        secure: true,
-        sameSite: "none",
-        domain: ".onrender.com",
-        path: "/"
-    });
     res.status(200).json({
         success: true,
         message: "Logged out successfully"
     });
 });
 
-// ==================== GOOGLE OAUTH ROUTES ====================
-// Step 1: Redirect to Google
+// ==================== GOOGLE OAUTH ====================
 Route.get("/google",
     passport.authenticate("google", {
         scope: ["profile", "email"],
@@ -50,11 +41,12 @@ Route.get("/google",
     })
 );
 
-// Step 2: Handle Google callback
 Route.get("/google/callback",
     (req, res, next) => {
         passport.authenticate("google", { session: false }, (err, user, info) => {
-            const frontendUrl = process.env.FRONTEND_URL || "https://authentication-system-tawny.vercel.app";
+            const frontendUrl =
+                process.env.FRONTEND_URL ||
+                "https://authentication-system-tawny.vercel.app";
 
             if (err) {
                 console.error("❌ Google auth error:", err);
@@ -67,46 +59,31 @@ Route.get("/google/callback",
             }
 
             try {
-                // Generate JWT token
                 const token = jwt.sign(
-                    {
-                        id: user._id,
-                        email: user.email,
-                        name: user.name
-                    },
+                    { id: user._id, email: user.email, name: user.name },
                     process.env.JWT_SECRET,
                     { expiresIn: "7d" }
                 );
 
-                // ✅ Set cookie for cross-domain auth
-                res.cookie("token", token, {
-                    httpOnly: true,
-                    secure: true,                  // HTTPS only
-                    sameSite: "none",              // ✅ Required for cross-domain
-                    maxAge: 7 * 24 * 60 * 60 * 1000,
-                    domain: ".onrender.com",       // Cookie scoped to onrender
-                    path: "/"
-                });
+                // ✅ Redirect to frontend with token in URL
+                const userData = encodeURIComponent(
+                    JSON.stringify({
+                        id: user._id,
+                        name: user.name,
+                        email: user.email
+                    })
+                );
 
-                // ✅ Redirect to /dashboard (NO token in URL — cookie handles auth)
-                console.log("✅ Google OAuth successful, cookie set, redirecting to /dashboard");
-                res.redirect(`${frontendUrl}/dashboard`);
+                console.log("✅ Google OAuth success, redirecting with token");
+                res.redirect(
+                    `${frontendUrl}/oauth-success?token=${token}&user=${userData}`
+                );
             } catch (error) {
-                console.error("❌ Token generation error:", error);
+                console.error("❌ Token error:", error);
                 res.redirect(`${frontendUrl}/?error=token_error`);
             }
         })(req, res, next);
     }
 );
-
-console.log("✅ Routes registered:");
-console.log("   - POST /api/register");
-console.log("   - POST /api/login");
-console.log("   - POST /api/forgot-password");
-console.log("   - POST /api/reset-password/:token");
-console.log("   - GET  /api/me (cookie-based)");
-console.log("   - POST /api/logout");
-console.log("   - GET  /api/google");
-console.log("   - GET  /api/google/callback");
 
 export default Route;

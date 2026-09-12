@@ -20,7 +20,8 @@ Route.get(
     "/google/callback",
     passport.authenticate("google", {
         session: false,
-        failureRedirect: `${process.env.FRONTEND_URL}/login?error=oauth_failed`
+        // ✅ FIX: Redirect errors to / instead of /login
+        failureRedirect: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/?error=oauth_failed`
     }),
     async (req, res) => {
         try {
@@ -42,8 +43,10 @@ Route.get(
             });
 
             const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+
+            // ✅ FIX: Redirect to / instead of /oauth-success
             res.redirect(
-                `${frontendUrl}/oauth-success?token=${token}&user=${encodeURIComponent(JSON.stringify({
+                `${frontendUrl}/?token=${token}&user=${encodeURIComponent(JSON.stringify({
                     id: req.user._id,
                     name: req.user.name,
                     email: req.user.email
@@ -51,7 +54,8 @@ Route.get(
             );
         } catch (error) {
             console.error('Google OAuth Callback Error:', error);
-            res.redirect(`${process.env.FRONTEND_URL}/login?error=oauth_error`);
+            // ✅ FIX: Redirect errors to / instead of /login
+            res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:5173'}/?error=oauth_error`);
         }
     }
 );
@@ -77,9 +81,9 @@ Route.get("/logout", (req, res) => {
 });
 
 console.log("✅ Google OAuth Routes registered:");
-console.log("   - GET /auth/google");
-console.log("   - GET /auth/google/callback");
-console.log("   - GET /auth/google/user");
-console.log("   - GET /auth/logout");
+console.log("   - GET /api/google");
+console.log("   - GET /api/google/callback");
+console.log("   - GET /api/google/user");
+console.log("   - GET /api/logout");
 
 export default Route;

@@ -16,11 +16,21 @@ Route.post("/register", RegisterData);
 Route.post("/login", LoginLimit, Login);
 Route.post("/forgot-password", Forgot);
 Route.post("/reset-password/:token", ResetPassword);
-Route.get("/me", auth, (req, res) => {
-    res.status(200).json({
-        success: true,
-        user: req.user
-    });
+
+// ✅ Public /me - returns 401 if not logged in (for auth check)
+Route.get("/me", (req, res, next) => {
+    passport.authenticate("jwt", { session: false }, (err, user) => {
+        if (err || !user) {
+            return res.status(401).json({
+                success: false,
+                message: "Not authenticated"
+            });
+        }
+        return res.status(200).json({
+            success: true,
+            user: user
+        });
+    })(req, res, next);
 });
 
 // ==================== GOOGLE OAUTH ROUTES ====================
@@ -36,16 +46,18 @@ Route.get("/google",
 Route.get("/google/callback",
     (req, res, next) => {
         passport.authenticate("google", { session: false }, (err, user, info) => {
+            const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
+
             if (err) {
                 console.error("❌ Google auth error:", err);
-                const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
-                return res.redirect(`${frontendUrl}/login?error=oauth_error`);
+                // ✅ Redirect to / instead of /login
+                return res.redirect(`${frontendUrl}/?error=oauth_error`);
             }
 
             if (!user) {
                 console.error("❌ Google auth failed:", info);
-                const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
-                return res.redirect(`${frontendUrl}/login?error=oauth_failed`);
+                // ✅ Redirect to / instead of /login
+                return res.redirect(`${frontendUrl}/?error=oauth_failed`);
             }
 
             try {
@@ -68,20 +80,19 @@ Route.get("/google/callback",
                     maxAge: 7 * 24 * 60 * 60 * 1000
                 });
 
-                // Redirect to frontend with token
-                const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
+                // ✅ FIX: Redirect to / instead of /oauth-success
                 const userData = encodeURIComponent(JSON.stringify({
                     id: user._id,
                     name: user.name,
                     email: user.email
                 }));
 
-                console.log("✅ Google OAuth successful, redirecting to:", `${frontendUrl}/oauth-success`);
-                res.redirect(`${frontendUrl}/oauth-success?token=${token}&user=${userData}`);
+                console.log("✅ Google OAuth successful, redirecting to /");
+                res.redirect(`${frontendUrl}/?token=${token}&user=${userData}`);
             } catch (error) {
                 console.error("❌ Token generation error:", error);
-                const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
-                res.redirect(`${frontendUrl}/login?error=token_error`);
+                // ✅ Redirect to / instead of /login
+                res.redirect(`${frontendUrl}/?error=token_error`);
             }
         })(req, res, next);
     }

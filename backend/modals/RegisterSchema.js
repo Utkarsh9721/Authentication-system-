@@ -11,19 +11,22 @@ const RegisterSchema = new mongoose.Schema({
     email: {
         type: String,
         required: true,
-        unique: true, // ✅ Keep this
+        unique: true,
         lowercase: true,
         trim: true
     },
+    // ✅ Conditional password (not required for Google users)
     password: {
         type: String,
-        required: true,
+        required: function () {
+            return this.authProvider === 'local';
+        },
         select: false
     },
+    // ✅ Google OAuth fields
     googleId: {
         type: String,
         sparse: true,
-        // ❌ Remove 'index: true' from here
         unique: true
     },
     authProvider: {
@@ -53,22 +56,17 @@ const RegisterSchema = new mongoose.Schema({
     timestamps: true
 });
 
-// ❌ Remove these duplicate index definitions
-// RegisterSchema.index({ email: 1 });
-// RegisterSchema.index({ googleId: 1 });
+// ✅ FIXED: async function without next, OR with next parameter
+RegisterSchema.pre("save", async function () {
+    // Skip if password not modified or if Google user
+    if (!this.isModified("password") || this.authProvider === "google") {
+        return;
+    }
 
-// Hash password before saving
-RegisterSchema.pre("save", async function (next) {
-    if (!this.isModified("password") || this.authProvider === 'google') {
-        return next();
-    }
-    try {
-        const salt = await bcrypt.genSalt(10);
-        this.password = await bcrypt.hash(this.password, salt);
-        next();
-    } catch (error) {
-        next(error);
-    }
+    // Hash password (async function auto-resolves)
+    const salt = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password, salt);
+    // No next() needed - async function handles it
 });
 
 // Compare password method

@@ -12,7 +12,9 @@ const Login = () => {
     const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
     const navigate = useNavigate();
-    const BackendURL = import.meta.env.VITE_BACKEND_URL || "https://authentication-system-sh1d.onrender.com";
+    const BackendURL =
+        import.meta.env.VITE_BACKEND_URL ||
+        "https://authentication-system-sh1d.onrender.com";
 
     // Track mouse position for interactive background
     useEffect(() => {
@@ -27,50 +29,37 @@ const Login = () => {
         return () => window.removeEventListener("mousemove", handleMouseMove);
     }, []);
 
-    // ✅ Handle Google OAuth callback (success AND error)
+    // ✅ Handle OAuth error only — no token parsing (cookie handles auth)
     useEffect(() => {
         const params = new URLSearchParams(window.location.search);
-        const token = params.get("token");
-        const userParam = params.get("user");
         const errorParam = params.get("error");
 
-        // Handle OAuth ERROR
         if (errorParam) {
-            const errorMessages = {
+            const messages = {
                 oauth_error: "Google authentication failed. Please try again.",
                 oauth_failed: "Google login was cancelled.",
                 token_error: "Failed to complete login. Please try again."
             };
-            setError(errorMessages[errorParam] || "Authentication failed. Please try again.");
+            setError(messages[errorParam] || "Authentication failed. Please try again.");
             window.history.replaceState({}, document.title, "/");
-            return;
         }
+    }, []);
 
-        // Handle OAuth SUCCESS
-        if (token) {
-            localStorage.setItem("token", token);
-            if (userParam) {
-                try {
-                    const user = JSON.parse(decodeURIComponent(userParam));
-                    localStorage.setItem("user", JSON.stringify(user));
-                } catch (e) {
-                    console.error("Failed to parse user data:", e);
-                }
-            }
-            window.history.replaceState({}, document.title, "/");
-            navigate("/dashboard");
-        }
-    }, [navigate]);
-
-    // Check if user is already logged in (separate useEffect)
+    // ✅ Check if already logged in via cookie
     useEffect(() => {
-        const token = localStorage.getItem("token");
-        // Only redirect if there's no OAuth param in URL (avoid conflict)
-        const params = new URLSearchParams(window.location.search);
-        if (token && !params.get("error") && !params.get("token")) {
-            navigate("/dashboard");
-        }
-    }, [navigate]);
+        const checkAuth = async () => {
+            try {
+                await axios.get(`${BackendURL}/api/me`, {
+                    withCredentials: true
+                });
+                // Cookie valid → go to dashboard
+                navigate("/dashboard");
+            } catch {
+                // Not logged in → stay on login page
+            }
+        };
+        checkAuth();
+    }, [navigate, BackendURL]);
 
     // Google Login
     const googleLogin = () => {
@@ -93,16 +82,10 @@ const Login = () => {
             const res = await axios.post(
                 `${BackendURL}/api/login`,
                 { email, password },
-                { withCredentials: true }
+                { withCredentials: true }   // ✅ Send/receive cookies
             );
 
-            if (res.data.token) {
-                localStorage.setItem("token", res.data.token);
-                if (res.data.data) {
-                    localStorage.setItem("user", JSON.stringify(res.data.data));
-                }
-            }
-
+            // ✅ No localStorage — cookie handles auth
             setSuccess(res.data.message || "Login successful!");
             setEmail("");
             setPassword("");
@@ -110,7 +93,6 @@ const Login = () => {
             setTimeout(() => {
                 navigate("/dashboard");
             }, 500);
-
         } catch (error) {
             if (error.response) {
                 setError(error.response.data.message || "Login failed");

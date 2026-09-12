@@ -4,10 +4,10 @@ import passport from "passport";
 import jwt from "jsonwebtoken";
 import RegisterData from "../controllers/register/register.js";
 import Login from "../controllers/login/login.js";
-import auth from "../middleware/authMiddleware.js";
 import LoginLimit from "../middleware/rateLimit.js";
 import Forgot from "../controllers/forgotpass/forgotPass.js";
 import ResetPassword from "../controllers/forgotpass/newPass.js";
+import authMiddleware from "../middleware/authMiddleware.js";
 
 const Route = express.Router();
 
@@ -17,20 +17,28 @@ Route.post("/login", LoginLimit, Login);
 Route.post("/forgot-password", Forgot);
 Route.post("/reset-password/:token", ResetPassword);
 
-// ✅ Public /me - returns 401 if not logged in (for auth check)
-Route.get("/me", (req, res, next) => {
-    passport.authenticate("jwt", { session: false }, (err, user) => {
-        if (err || !user) {
-            return res.status(401).json({
-                success: false,
-                message: "Not authenticated"
-            });
-        }
-        return res.status(200).json({
-            success: true,
-            user: user
-        });
-    })(req, res, next);
+// ==================== AUTH CHECK ====================
+// ✅ Reads cookie (via authMiddleware) and returns user
+Route.get("/me", authMiddleware, (req, res) => {
+    res.status(200).json({
+        success: true,
+        user: req.user
+    });
+});
+
+// ==================== LOGOUT ====================
+Route.post("/logout", (req, res) => {
+    res.clearCookie("token", {
+        httpOnly: true,
+        secure: true,
+        sameSite: "none",
+        domain: ".onrender.com",
+        path: "/"
+    });
+    res.status(200).json({
+        success: true,
+        message: "Logged out successfully"
+    });
 });
 
 // ==================== GOOGLE OAUTH ROUTES ====================
@@ -46,17 +54,15 @@ Route.get("/google",
 Route.get("/google/callback",
     (req, res, next) => {
         passport.authenticate("google", { session: false }, (err, user, info) => {
-            const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
+            const frontendUrl = process.env.FRONTEND_URL || "https://authentication-system-tawny.vercel.app";
 
             if (err) {
                 console.error("❌ Google auth error:", err);
-                // ✅ Redirect to / instead of /login
                 return res.redirect(`${frontendUrl}/?error=oauth_error`);
             }
 
             if (!user) {
                 console.error("❌ Google auth failed:", info);
-                // ✅ Redirect to / instead of /login
                 return res.redirect(`${frontendUrl}/?error=oauth_failed`);
             }
 
@@ -72,26 +78,21 @@ Route.get("/google/callback",
                     { expiresIn: "7d" }
                 );
 
-                // Set cookie (optional)
+                // ✅ Set cookie for cross-domain auth
                 res.cookie("token", token, {
                     httpOnly: true,
-                    secure: process.env.NODE_ENV === "production",
-                    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-                    maxAge: 7 * 24 * 60 * 60 * 1000
+                    secure: true,                  // HTTPS only
+                    sameSite: "none",              // ✅ Required for cross-domain
+                    maxAge: 7 * 24 * 60 * 60 * 1000,
+                    domain: ".onrender.com",       // Cookie scoped to onrender
+                    path: "/"
                 });
 
-                // ✅ FIX: Redirect to / instead of /oauth-success
-                const userData = encodeURIComponent(JSON.stringify({
-                    id: user._id,
-                    name: user.name,
-                    email: user.email
-                }));
-
-                console.log("✅ Google OAuth successful, redirecting to /");
-                res.redirect(`${frontendUrl}/?token=${token}&user=${userData}`);
+                // ✅ Redirect to /dashboard (NO token in URL — cookie handles auth)
+                console.log("✅ Google OAuth successful, cookie set, redirecting to /dashboard");
+                res.redirect(`${frontendUrl}/dashboard`);
             } catch (error) {
                 console.error("❌ Token generation error:", error);
-                // ✅ Redirect to / instead of /login
                 res.redirect(`${frontendUrl}/?error=token_error`);
             }
         })(req, res, next);
@@ -103,8 +104,9 @@ console.log("   - POST /api/register");
 console.log("   - POST /api/login");
 console.log("   - POST /api/forgot-password");
 console.log("   - POST /api/reset-password/:token");
-console.log("   - GET /api/me");
-console.log("   - GET /api/google");
-console.log("   - GET /api/google/callback");
+console.log("   - GET  /api/me (cookie-based)");
+console.log("   - POST /api/logout");
+console.log("   - GET  /api/google");
+console.log("   - GET  /api/google/callback");
 
 export default Route;

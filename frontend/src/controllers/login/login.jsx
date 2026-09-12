@@ -27,20 +27,26 @@ const Login = () => {
         return () => window.removeEventListener("mousemove", handleMouseMove);
     }, []);
 
-    // Check if user is already logged in
-    useEffect(() => {
-        const token = localStorage.getItem("token");
-        if (token) {
-            navigate("/dashboard");
-        }
-    }, [navigate]);
-
-    // Handle Google OAuth callback
+    // ✅ Handle Google OAuth callback (success AND error)
     useEffect(() => {
         const params = new URLSearchParams(window.location.search);
         const token = params.get("token");
         const userParam = params.get("user");
+        const errorParam = params.get("error");
 
+        // Handle OAuth ERROR
+        if (errorParam) {
+            const errorMessages = {
+                oauth_error: "Google authentication failed. Please try again.",
+                oauth_failed: "Google login was cancelled.",
+                token_error: "Failed to complete login. Please try again."
+            };
+            setError(errorMessages[errorParam] || "Authentication failed. Please try again.");
+            window.history.replaceState({}, document.title, "/");
+            return;
+        }
+
+        // Handle OAuth SUCCESS
         if (token) {
             localStorage.setItem("token", token);
             if (userParam) {
@@ -51,11 +57,22 @@ const Login = () => {
                     console.error("Failed to parse user data:", e);
                 }
             }
+            window.history.replaceState({}, document.title, "/");
             navigate("/dashboard");
         }
     }, [navigate]);
 
-    // Google Login - WITHOUT /api prefix (matches Google Console)
+    // Check if user is already logged in (separate useEffect)
+    useEffect(() => {
+        const token = localStorage.getItem("token");
+        // Only redirect if there's no OAuth param in URL (avoid conflict)
+        const params = new URLSearchParams(window.location.search);
+        if (token && !params.get("error") && !params.get("token")) {
+            navigate("/dashboard");
+        }
+    }, [navigate]);
+
+    // Google Login
     const googleLogin = () => {
         window.location.href = `${BackendURL}/api/google`;
     };
@@ -79,7 +96,6 @@ const Login = () => {
                 { withCredentials: true }
             );
 
-            // Store token and user data
             if (res.data.token) {
                 localStorage.setItem("token", res.data.token);
                 if (res.data.data) {
